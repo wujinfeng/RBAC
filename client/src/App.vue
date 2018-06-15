@@ -1,30 +1,24 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    <div>
-      <el-button @click="startHacking">Start</el-button>
-    </div>
-  </div>
+  <router-view></router-view>
 </template>
 
 <script>
-export default {
-  methods: {
-    startHacking () {
-      this.$notify({
-        title: 'It works!',
-        type: 'success',
-        message: 'We\'ve laid the ground work for you. It\'s time for you to build something epic!',
-        duration: 5000
-      })
+  import * as types from '@/store/mutations-types'
+
+  export default {
+    name: 'App',
+    created() {
+      // 页面刷新时，重新赋值token
+      if (window.localStorage.getItem('token')) {
+        let data = {
+          id: localStorage.getItem('id'),
+          name: localStorage.getItem('name'),
+          mobile: localStorage.getItem('mobile'),
+          token: localStorage.getItem('token')
+        }
+        console.log('router,刷新', data)
+        this.$store.commit(types.LOGIN, data)
+      }
     }
   }
-}
 </script>
-
-<style>
-#app {
-  font-family: Helvetica, sans-serif;
-  text-align: center;
-}
-</style>

@@ -92,7 +92,7 @@ class BaseModel {
     /**
      * 取得带条件的sql
      * @param sql
-     * @param option
+     * @param options
      * @returns {{sql: *, options: *}}
      */
     getExecParamByOption(sql, options) {

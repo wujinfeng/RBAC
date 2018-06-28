@@ -11,38 +11,14 @@ router.post('/login', function (req, res, next) {
 router.get('/id/:id', function (req, res, next) {
     new UserController(req).getUserById(req, res, next);
 });
-// 景区用户
-router.get('/placeUserList', function (req, res, next) {
-    new UserController(req).placeUserList(req, res, next);
-});
-// 旅行社用户
-router.get('/travelUserList', function (req, res, next) {
-    new UserController(req).travelUserList(req, res, next);
+// 用户
+router.get('/list', function (req, res, next) {
+    new UserController(req).list(req, res, next);
 });
 
-// 导游等旅游行业从业者
-router.get('/guideUserList', function (req, res, next) {
-    new UserController(req).guideUserList(req, res, next);
-});
-// 商家等旅游行业企业
-router.get('/merchantUserList', function (req, res, next) {
-    new UserController(req).merchantUserList(req, res, next);
-});
-// 司机
-router.get('/driverUserList', function (req, res, next) {
-    new UserController(req).driverUserList(req, res, next);
-});
-// 游客用户
-router.get('/visitorUserList', function (req, res, next) {
-    new UserController(req).visitorUserList(req, res, next);
-});
-// 景区人员添加
-router.post('/placeAdd', function (req, res, next) {
-    new UserController(req).placeAdd(req, res, next);
-});
-// 旅行社人员添加
-router.post('/travelAdd', function (req, res, next) {
-    new UserController(req).travelAdd(req, res, next);
+// 添加
+router.post('/add', function (req, res, next) {
+    new UserController(req).add(req, res, next);
 });
 
 router.post('/edit', function (req, res, next) {

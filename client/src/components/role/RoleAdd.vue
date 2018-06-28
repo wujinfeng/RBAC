@@ -63,20 +63,20 @@
             let form = that.ruleForm
             console.log(form)
             let url = '/admin/role/add'
-            if (that.id) {
+            if (that.ruleForm.id) {
               url = '/admin/role/edit'
             }
             that.$axios.post(url, form).then(function (res) {
               if (res.status === 200 && res.data.code === 200) {
-                that.$message({type: 'success', message: '添加成功'})
+                that.$message({type: 'success', message: '保存成功'})
                 that.$router.push({name: 'RoleList'}) // 跳转列表页
               } else {
-                that.$message({type: 'error', message: '添加失败'})
+                that.$message({type: 'error', message: '保存失败'})
               }
             }).catch(function (err) {
               console.log('查询err:')
               console.log(err)
-              that.$message({type: 'error', message: '添加失败'})
+              that.$message({type: 'error', message: '保存失败'})
             })
           } else {
             that.$message({type: 'error', message: '提交失败'})

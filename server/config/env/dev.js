@@ -19,7 +19,7 @@ module.exports = {
     },
     upload: {
         path: path.join(__dirname, '../../public'),
-        url: 'http://127.0.0.1',
+        url: 'http://127.0.0.1:3001',
         rootPath: '/upload/',
         fileLimit: '10 * 1024 * 1024',  //10MB
         fileMaxCount: 10

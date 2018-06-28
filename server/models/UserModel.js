@@ -22,15 +22,14 @@ class UserModel extends BaseModel {
     }
 
     list(params, page, pageSize, cb) {
-        let con = ' where b.role="admin" ';
+        let con = '';
         let self = this;
-        if (params.name) {
-            con += ` and b.name like ${mysql.escape('%' + params.name + '%')} `;
+        if (params.username) {
+            con += ` where b.username like ${mysql.escape('%' + params.username + '%')} `;
         }
-        let sql = `SELECT b.id,b.name,b.sex,b.status,b.parent,b.mobile,p.name as parentName,
-                DATE_FORMAT(b.ctime, "%Y-%m-%d %H:%i:%s") as time
+        let sql = `SELECT b.id,b.username,b.name,b.status,b.phone,b.avatar,b.email,
+                DATE_FORMAT(b.ctime, "%Y-%m-%d %H:%i:%s") as ctime
                 from ${self.baseDb}user b
-                LEFT JOIN ${self.baseDb}place p ON b.parent=p.id
                 ${con} order by b.ctime desc limit ?,?`;
         let execParam = self.getExecParamByOption(sql, [(page - 1) * pageSize, pageSize]);
         console.log(execParam);
@@ -71,28 +70,21 @@ class UserModel extends BaseModel {
     }
 
     // 检查手机号是否存在
-    checkMobile(params, cb) {
+    checkUserName(params, cb) {
         let con = '';
         if (params.pageStatus === 'edit') {
             con = ` and id!=${mysql.escape(params.id)}`;
         }
         let self = this;
-        let sql = `select id from ${self.baseDb}user where phone=? ${con}`;
+        let sql = `select id from ${self.baseDb}user where username=? ${con}`;
         let execParam = self.getExecParamByOption(sql, params.mobile);
-        self.execSql(execParam, cb);
-    }
-
-    filterName(params, cb) {
-        let self = this;
-        let sql = `select id,name,mobile,status from ${self.baseDb}user where name like ?`;
-        let execParam = self.getExecParamByOption(sql, `%${params.name}%`);
         self.execSql(execParam, cb);
     }
 
     getUserRole(cb){
         let self = this;
         let sql = `select ur.userId,ur.roleId,u.phone, u.username, u.status as userStatus,
-            r.name,r.status as roleStatus from ${self.baseDb}user_role as ur
+            r.name as roleName,r.status as roleStatus from ${self.baseDb}user_role as ur
             left join  ${self.baseDb}user as u on ur.userId=u.id
             left join  ${self.baseDb}role as r on ur.roleId=r.id                
         `;

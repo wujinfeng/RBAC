@@ -56,16 +56,13 @@
   export default {
     name: 'UserAdd',
     data() {
-      var checkMobile = (rule, value, callback) => {
+      var checkUserName = (rule, value, callback) => {
         let that = this
         if (!value) {
-          return callback(new Error('手机号不能为空'))
+          return callback(new Error('不能为空'))
         }
-        let mobile = value.toString()
-        if (!/^1\d{10}$/.test(mobile)) {
-          return callback(new Error('填写正确的手机号'))
-        }
-        that.$axios.get('/admin/user/checkMobile/?pageStatus=' + that.pageStatus + '&mobile=' + mobile).then(function (res) {
+        let username = value.toString()
+        that.$axios.get('/admin/user/checkUserName/?pageStatus=' + that.pageStatus + '&username=' + username).then(function (res) {
           if (res.status === 200 && res.data.code === 200) {
             return callback()
           } else {
@@ -107,11 +104,10 @@
           email: ''
         },
         rules: {
-          username: [{required: true, message: '请输入用户名', trigger: 'blur'}],
-          phone: [
-            {required: true, message: '请输入手机号', trigger: 'blur'},
-            {validator: checkMobile, trigger: 'blur'}
+          username: [{required: true, message: '请输入用户名', trigger: 'blur'},
+            {validator: checkUserName, trigger: 'blur'}
           ],
+          phone: [{required: true, message: '请输入手机号', trigger: 'blur'}],
           password: [{validator: checkPassword, trigger: 'blur'}],
           name: [{required: true, message: '请输入名称', trigger: 'blur'}],
           status: [{required: true, message: '请选择状态', trigger: 'blur'}],

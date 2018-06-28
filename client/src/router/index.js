@@ -14,6 +14,9 @@ import RoleList from '@/components/role/RoleList'
 import RoleAdd from '@/components/role/RoleAdd'
 import RoleAccessList from '@/components/role/RoleAccessList'
 
+import EleAccessList from '@/components/access/EleAccessList'
+import MenuAccessList from '@/components/access/MenuAccessList'
+
 import LoginLogList from '@/components/log/LoginLogList'
 import HandleLogList from '@/components/log/HandleLogList'
 
@@ -40,6 +43,9 @@ let router = new Router({
         {path: 'RoleList', name: 'RoleList', component: RoleList}, // 角色列表
         {path: 'RoleAdd', name: 'RoleAdd', component: RoleAdd}, // 角色添加
         {path: 'RoleAccessList', name: 'RoleAccessList', component: RoleAccessList}, // 角色权限列表
+
+        {path: 'MenuAccessList', name: 'MenuAccessList', component: MenuAccessList}, // 菜单权限列表
+        {path: 'EleAccessList', name: 'EleAccessList', component: EleAccessList}, // 元素权限列表
 
         {path: 'LoginLogList', name: 'LoginLogList', component: LoginLogList}, // 登录日志
         {path: 'HandleLogList', name: 'HandleLogList', component: HandleLogList}, // 操作日志

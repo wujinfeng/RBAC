@@ -4,7 +4,7 @@
       <el-submenu index="1">
         <template slot="title"><i class="el-icon-message"></i>用户管理</template>
         <el-menu-item :route="{name: 'UserList'}" index="1-1">用户列表</el-menu-item>
-        <el-menu-item :route="{name: 'UserList'}" index="1-2">用户添加</el-menu-item>
+        <el-menu-item :route="{name: 'UserAdd'}" index="1-2">用户添加</el-menu-item>
         <el-menu-item :route="{name: 'UserRoleList'}" index="1-3">用户角色</el-menu-item>
       </el-submenu>
       <el-submenu index="2">
@@ -15,7 +15,8 @@
       </el-submenu>
       <el-submenu index="3">
         <template slot="title"><i class="el-icon-setting"></i>权限管理</template>
-        <el-menu-item :route="{name: 'AccessList'}" index="3-1">权限列表</el-menu-item>
+        <el-menu-item :route="{name: 'MenuAccessList'}" index="3-1">菜单权限</el-menu-item>
+        <el-menu-item :route="{name: 'EleAccessList'}" index="3-2">元素权限</el-menu-item>
       </el-submenu>
       <el-submenu index="35">
         <template slot="title"><i class="el-icon-news"></i>优惠活动</template>

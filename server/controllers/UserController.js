@@ -35,7 +35,13 @@ class UserController extends BaseController {
             if (row.length > 0) {
                 logger.info('登录mobile:' + mobile);
                 let doc = row[0];
-                let userinfo = {id: doc.id, name: doc.name, mobile: doc.mobile, role: doc.role, time:new Date().getTime()};
+                let userinfo = {
+                    id: doc.id,
+                    name: doc.name,
+                    mobile: doc.mobile,
+                    role: doc.role,
+                    time: new Date().getTime()
+                };
                 userinfo.token = jwt.sign(userinfo, config.tokenSecret);
                 return res.json({code: 200, msg: '登录成功', data: userinfo});
             }
@@ -44,16 +50,16 @@ class UserController extends BaseController {
     }
 
     // 景区用户
-    placeUserList(req, res, next) {
+    list(req, res, next) {
         let self = this;
-        let name = req.query.name ? req.query.name.trim() : '';
+        let username = req.query.username ? req.query.username.trim() : '';
         let params = {};
-        if (name) {
-            params.name = name;
+        if (username) {
+            params.username = username;
         }
         let page = parseInt(req.query.currentPage || 1);
         let pageSize = parseInt(req.query.pageSize || 10);
-        self.userModel.placeUserList(params, page, pageSize, (err, row, count) => {
+        self.userModel.list(params, page, pageSize, (err, row, count) => {
             if (err) {
                 logger.error(err);
                 res.json({code: 500, msg: err, data: []});
@@ -63,114 +69,10 @@ class UserController extends BaseController {
         });
     }
 
-    // 旅行社用户
-    travelUserList(req, res, next) {
+    add(req, res) {
         let self = this;
-        let name = req.query.name ? req.query.name.trim() : '';
-        let params = {};
-        if (name) {
-            params.name = name;
-        }
-        let page = parseInt(req.query.currentPage || 1);
-        let pageSize = parseInt(req.query.pageSize || 10);
-        self.userModel.travelUserList(params, page, pageSize, (err, row, count) => {
-            if (err) {
-                logger.error(err);
-                res.json({code: 500, msg: err, data: []});
-            } else {
-                console.log(row, count)
-                res.json({code: 200, msg: '', data: {tableData: row, totalNum: count}});
-            }
-        });
-    }
-
-    //  导游等旅游行业从业者
-    guideUserList(req, res, next) {
-        let self = this;
-        let name = req.query.name ? req.query.name.trim() : '';
-        let params = {};
-        if (name) {
-            params.name = name;
-        }
-        let page = parseInt(req.query.currentPage || 1);
-        let pageSize = parseInt(req.query.pageSize || 10);
-        self.userModel.guideUserList(params, page, pageSize, (err, row, count) => {
-            if (err) {
-                logger.error(err);
-                res.json({code: 500, msg: err, data: []});
-            } else {
-                console.log(row, count)
-                res.json({code: 200, msg: '', data: {tableData: row, totalNum: count}});
-            }
-        });
-    }
-
-    // 商家等旅游行业企业
-    merchantUserList(req, res, next) {
-        let self = this;
-        let name = req.query.name ? req.query.name.trim() : '';
-        let params = {};
-        if (name) {
-            params.name = name;
-        }
-        let page = parseInt(req.query.currentPage || 1);
-        let pageSize = parseInt(req.query.pageSize || 10);
-        self.userModel.merchantUserList(params, page, pageSize, (err, row, count) => {
-            if (err) {
-                logger.error(err);
-                res.json({code: 500, msg: err, data: []});
-            } else {
-                console.log(row, count)
-                res.json({code: 200, msg: '', data: {tableData: row, totalNum: count}});
-            }
-        });
-    }
-
-    // 司机
-    driverUserList(req, res, next) {
-        let self = this;
-        let name = req.query.name ? req.query.name.trim() : '';
-        let params = {};
-        if (name) {
-            params.name = name;
-        }
-        let page = parseInt(req.query.currentPage || 1);
-        let pageSize = parseInt(req.query.pageSize || 10);
-        self.userModel.driverUserList(params, page, pageSize, (err, row, count) => {
-            if (err) {
-                logger.error(err);
-                res.json({code: 500, msg: err, data: []});
-            } else {
-                res.json({code: 200, msg: '', data: {tableData: row, totalNum: count}});
-            }
-        });
-    }
-
-    // 游客用户
-    visitorUserList(req, res, next) {
-        let self = this;
-        let name = req.query.name ? req.query.name.trim() : '';
-        let params = {};
-        if (name) {
-            params.name = name;
-        }
-        let page = parseInt(req.query.currentPage || 1);
-        let pageSize = parseInt(req.query.pageSize || 10);
-        self.userModel.visitorUserList(params, page, pageSize, (err, row, count) => {
-            if (err) {
-                logger.error(err);
-                res.json({code: 500, msg: err, data: []});
-            } else {
-                console.log(row, count)
-                res.json({code: 200, msg: '', data: {tableData: row, totalNum: count}});
-            }
-        });
-    }
-
-    add(req, res, role) {
-        let self = this;
-        let data = placeUserData(req.body);
-        data.role = role;
+        let data = postData(req.body);
+        console.log(data)
         self.userModel.add(data, (err) => {
             if (err) {
                 logger.error('添加出错');
@@ -182,19 +84,10 @@ class UserController extends BaseController {
         });
     }
 
-    placeAdd(req, res) {
-        this.add(req, res, 'admin');
-    }
-
-    // 旅行社添加
-    travelAdd(req, res) {
-        this.add(req, res, 'travelAgent');
-    }
-
     edit(req, res) {
         let self = this;
         let id = req.body.id;
-        let data = placeUserData(req.body);
+        let data = postData(req.body);
         self.userModel.edit(id, data, (err) => {
             if (err) {
                 logger.error('编辑出错');
@@ -241,13 +134,13 @@ class UserController extends BaseController {
         });
     }
 
-    checkMobile(req, res) {
+    checkUserName(req, res) {
         let self = this;
-        let mobile = req.query.mobile;
+        let username = req.query.username;
         let pageStatus = req.query.pageStatus;
         let id = req.query.id;
-        let params = {id: id, mobile: mobile, pageStatus: pageStatus};
-        self.userModel.checkMobile(params, (err, result) => {
+        let params = {id: id, username: username, pageStatus: pageStatus};
+        self.userModel.checkUserName(params, (err, result) => {
             if (err) {
                 logger.error(err);
                 res.json({code: 500, msg: err});
@@ -267,50 +160,14 @@ class UserController extends BaseController {
         if (!id || !status) {
             return res.json({code: 400, msg: '参数错误'});
         }
-        status = (status === 'pass') ? 1 : 5;
-        let auditorId = req.user.id;
-        let params = {status: status, auditorId: auditorId, auditTime: new Date()};
+        status = (status === 'pass') ? 1 : 2;
+        let params = {status: status};
         self.userModel.edit(id, params, (err) => {
             if (err) {
                 logger.error(err);
                 res.json({code: 500, msg: err});
             } else {
                 res.json({code: 200, msg: ''});
-            }
-        });
-    }
-
-    orgName(req, res) {
-        let self = this;
-        let orgName = req.params.orgName ? req.params.orgName.trim() : '';
-        let params = {};
-        if (orgName) {
-            params.name = orgName;
-        }
-        self.userModel.orgName(params, (err, row) => {
-            if (err) {
-                logger.error(err);
-                res.json({code: 500, msg: err, data: []});
-            } else {
-                console.log(row)
-                res.json({code: 200, msg: '', data: row});
-            }
-        });
-    }
-
-    filterName(req, res) {
-        let self = this;
-        let username = req.params.name ? req.params.name.trim() : '';
-        let params = {};
-        if (username) {
-            params.name = username;
-        }
-        self.userModel.filterName(params, (err, row) => {
-            if (err) {
-                logger.error(err);
-                res.json({code: 500, msg: err, data: []});
-            } else {
-                res.json({code: 200, msg: '', data: row});
             }
         });
     }
@@ -335,51 +192,31 @@ class UserController extends BaseController {
         });
     }
 
-    merchant(req, res) {
-        let self = this;
-        self.userModel.getAllMerchant((err, row) => {
-            if (err) {
-                logger.error(err);
-                res.json({code: 500, msg: err});
-            } else {
-                res.json({code: 200, msg: 'ok', data: row});
-            }
-        })
-    }
-
 }
 
-function placeUserData(body) {
+function postData(body) {
     let data = {};
+
+    if (body.username && body.username.trim()) {
+        data.username = body.username.trim()
+    }
+    if (body.password) {
+        data.password = comm.md5(comm.md5('' + body.password))
+    }
     if (body.name && body.name.trim()) {
         data.name = body.name.trim()
-    }
-    if (body.mobile && body.mobile.trim()) {
-        data.mobile = body.mobile.trim()
-    }
-    if (body.password && body.password.trim()) {
-        data.password = comm.md5(comm.md5('' + data.mobile + body.password.trim()))
-    }
-    if (body.parent) {
-        data.parent = body.parent
-    }
-    if (body.sex) {
-        data.sex = body.sex
     }
     if (body.status) {
         data.status = body.status
     }
-    if (body.isPrepay) {
-        data.isPrepay = body.isPrepay
+    if (body.phone) {
+        data.phone = body.phone
     }
-    if (body.orgAddr && body.orgAddr.trim()) {
-        data.orgAddr = body.orgAddr.trim()
+    if (body.avatar && body.avatar.trim()) {
+        data.avatar = body.avatar.trim()
     }
-    if (body.creditCode && body.creditCode.trim()) {
-        data.creditCode = body.creditCode.trim()
-    }
-    if (body.authPic && body.authPic.trim()) {
-        data.authPic = body.authPic.trim()
+    if (body.email && body.email.trim()) {
+        data.email = body.email.trim()
     }
     return data;
 }
@@ -387,13 +224,13 @@ function placeUserData(body) {
 function reqFile(req) {
     let file = req.files[0];
     let data = {
-        fieldname: file.fieldname || '', // 字段名
-        originalname: file.originalname || '', // 原始名
-        encoding: file.encoding || '', // 编码
-        mimetype: file.mimetype || '', // 类型
-        filename: file.filename || '', // 保存的文件名
-        relativeDir: file.relativeDir || '', // 保存的相对目录
-        size: file.size || '' // 空间大小
+        fieldname: file.fieldname || '',         // 字段名
+        originalname: file.originalname || '',   // 原始名
+        encoding: file.encoding || '',           // 编码
+        mimetype: file.mimetype || '',           // 类型
+        filename: file.filename || '',           // 保存的文件名
+        relativeDir: file.relativeDir || '',     // 保存的相对目录
+        size: file.size || ''                    // 空间大小
     };
     return data;
 }

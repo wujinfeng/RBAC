@@ -1,27 +1,19 @@
 <template>
   <div>
     <el-row :gutter="10">
-      <el-input v-model="name" placeholder="姓名"></el-input>
+      <el-input v-model="name" placeholder="菜单名称"></el-input>
       <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
     </el-row>
     <hr>
     <el-table :data="tableData">
-      <el-table-column prop="name" label="姓名"></el-table-column>
-      <el-table-column prop="parentName" label="景区"></el-table-column>
-      <el-table-column prop="mobile" label="手机号"></el-table-column>
-      <el-table-column prop="sex" :formatter="formatSex" label="性别"></el-table-column>
-      <el-table-column prop="status" :formatter="formatStatus" label="状态"></el-table-column>
-      <el-table-column prop="time" label="创建日期"></el-table-column>
-      <el-table-column prop="id" label="操作">
-        <template slot-scope="scope">
-          <router-link :to="{name:'RoleAdd',params:{id: scope.row.id, row: scope.row}}">
-            <el-button type="primary" size="small">编辑</el-button>
-          </router-link>
-          <router-link :to="{name:'Password',params:{id: scope.row.id, mobile: scope.row.mobile}}">
-            <el-button type="warning" size="small" title="修改密码">改密</el-button>
-          </router-link>
-        </template>
-      </el-table-column>
+      <el-table-column prop="sort" label="排序"></el-table-column>
+      <el-table-column prop="name" label="菜单名称"></el-table-column>
+      <el-table-column :formatter="formatType" label="子节点"></el-table-column>
+      <el-table-column prop="url" label="url"></el-table-column>
+      <el-table-column prop="parentName" label="父菜单"></el-table-column>
+      <el-table-column :formatter="formatStatus" label="状态"></el-table-column>
+      <el-table-column prop="icon" label="icon"></el-table-column>
+      <el-table-column prop="ctime" label="更新日期"></el-table-column>
     </el-table>
     <pagination v-on:getPageData="getTablePageData" :total-num="totalNum"></pagination>
   </div>
@@ -29,10 +21,11 @@
 
 <script>
   export default {
-    name: 'PlaceUserList',
+    name: 'BillingList',
     data() {
       return {
         name: '',
+        placeName: '',
         tableData: [],
         totalNum: 0
       }
@@ -41,15 +34,14 @@
       getTablePageData(pagerObj) {
         let params = {
           name: this.name,
+          placeName: this.placeName,
           currentPage: pagerObj.currentPage,
           pageSize: pagerObj.pageSize
         }
         this.query(this, params)
       },
       search() {
-        let params = {
-          name: this.name
-        }
+        let params = {name: this.name, placeName: this.placeName}
         this.query(this, params)
       },
       del(val, index) {
@@ -75,28 +67,29 @@
         let text = ''
         let status = row.status
         if (status === 1) {
-          text = '在岗启用'
-        } else if (status === 5) {
-          text = '离岗禁用'
+          text = '启用'
+        } else if (status === 2) {
+          text = '禁用'
         }
         return text
       },
-      formatSex(row, column, cellValue) {
+      formatType(row, column, cellValue) {
         let text = ''
-        let sex = row.sex
-        if (sex === 1) {
-          text = '男'
-        } else if (sex === 2) {
-          text = '女'
-        } else if (sex === 3) {
-          text = '其他'
+        let isLeaf = row.isLeaf
+        if (isLeaf === 1) {
+          text = '是'
+        } else {
+          text = '否'
         }
         return text
+      },
+      formatName(row, column, cellValue) {
+        return row.userName ? row.userName + '_' + row.mobile : ''
       },
       query(that, params) {
         console.log(params)
-        that.$axios.get('/admin/user/placeUserList', {params: params}).then(function (res) {
-          console.log(`查询ok`)
+        params.type = 1
+        that.$axios.get('/admin/access/list', {params: params}).then(function (res) {
           if (res.status === 200 && res.data.code === 200) {
             that.tableData = res.data.data.tableData
             that.totalNum = res.data.data.totalNum

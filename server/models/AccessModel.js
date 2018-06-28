@@ -24,7 +24,7 @@ class UserModel extends BaseModel {
                    DATE_FORMAT(m.ctime,"%Y-%m-%d %H:%i:%s") as ctime
                    FROM ${self.baseDb}menu as m
                    LEFT JOIN ${self.baseDb}menu as m1 ON m.parentId=m1.id           
-                   ${con} order by m.ctime desc limit ?,?`;
+                   ${con} order by m.sort limit ?,?`;
             countSql = `SELECT count(*) as count FROM ${self.baseDb}menu as m ${con}`;
         } else {
             if (params.name) {
@@ -34,7 +34,7 @@ class UserModel extends BaseModel {
                    DATE_FORMAT(m.ctime,"%Y-%m-%d %H:%i:%s") as ctime
                    FROM ${self.baseDb}element as e
                    LEFT JOIN ${self.baseDb}menu as m ON e.menuId=m.id           
-                   ${con} order by e.ctime desc limit ?,?`;
+                   ${con} order by e.menuId desc limit ?,?`;
             countSql = `SELECT count(*) as count FROM ${self.baseDb}element as e ${con}`;
         }
 

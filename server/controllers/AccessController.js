@@ -21,12 +21,13 @@ class Controller extends BaseController {
     list(req, res, next) {
         let self = this;
         let name = req.query.name ? req.query.name.trim() : '';
-        let type = req.query.type || 1;
+        let type = req.query.type || '1';
+        console.log(typeof(type))
         let params = {};
         if (name) {
             params.name = name;
         }
-        params.table = (type === 1) ? 'menu' : 'element';
+        params.table = (type === '1') ? 'menu' : 'element';
         let page = parseInt(req.query.currentPage || 1);
         let pageSize = parseInt(req.query.pageSize || 10);
         self.access.list(params, page, pageSize, (err, row, count) => {

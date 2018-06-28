@@ -36,7 +36,7 @@
 
 <script>
   export default {
-    name: 'GuideUserList',
+    name: 'UserList',
     data() {
       return {
         username: '',

@@ -1,5 +1,5 @@
 /**
- * 景区管理
+ * 角色管理
  */
 const BaseController = require('./BaseController');
 const RoleModel = require('../models/RoleModel');
@@ -27,9 +27,9 @@ class RoleController extends BaseController {
         let pageSize = parseInt(req.query.pageSize || 10);
         self.role.list(params, page, pageSize, (err, data, count) => {
             if (err) {
+                logger.error(err);
                 res.json({code: 500, msg: err, data: []});
             } else {
-                console.log(data, count)
                 res.json({code: 200, msg: '', data: {tableData: data, totalNum: count}});
             }
         });
@@ -47,13 +47,13 @@ class RoleController extends BaseController {
         });
     }
 
-    getroleById(req, res) {
+    getRoleById(req, res) {
         let self = this;
         let id = req.params.id ? req.params.id.trim() : '';
         if (!id) {
             return res.json({code: 400, msg: 'id not found', data: []});
         }
-        self.role.getroleById(id, (err, data) => {
+        self.role.getRoleById(id, (err, data) => {
             if (err) {
                 logger.error(err);
                 res.json({code: 500, msg: err, data: []});
@@ -64,13 +64,13 @@ class RoleController extends BaseController {
     }
 
     // 名字模糊查询
-    getroleByName(req, res) {
+    getRoleByName(req, res) {
         let self = this;
         let name = req.params.name ? req.params.name.trim() : '';
         if (!name) {
             return res.json({code: 400, msg: 'id not found', data: []});
         }
-        self.role.getroleByName(name, (err, data) => {
+        self.role.getRoleByName(name, (err, data) => {
             if (err) {
                 logger.error(err);
                 res.json({code: 500, msg: err, data: []});
@@ -132,18 +132,6 @@ function bodyData(body) {
     let data = {};
     if (body.name && body.name.trim()) {
         data.name = body.name.trim()
-    }
-    if (body.addr && body.addr.trim()) {
-        data.addr = body.addr.trim()
-    }
-    if (body.mobile && body.mobile.trim()) {
-        data.mobile = body.mobile.trim()
-    }
-    if (body.appid && body.appid.trim()) {
-        data.appid = body.appid.trim()
-    }
-    if (body.level) {
-        data.level = body.level
     }
     if (body.status) {
         data.status = body.status

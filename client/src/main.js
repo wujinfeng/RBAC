@@ -9,8 +9,8 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import App from './App'
 import router from './router'
-import DatePicker from '@/components/DatePicker'
-import Pagination from '@/components/Pagination.vue'
+import DatePicker from '@/components/comm/DatePicker'
+import Pagination from '@/components/comm/Pagination.vue'
 
 Vue.use(ElementUI, {size: 'small'})
 

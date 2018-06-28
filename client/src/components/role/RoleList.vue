@@ -7,17 +7,14 @@
     <hr>
     <el-table :data="tableData">
       <el-table-column prop="name" label="名称"></el-table-column>
-      <el-table-column prop="addr" label="地点"></el-table-column>
-      <el-table-column prop="mobile" label="联系电话"></el-table-column>
-      <el-table-column prop="level" :formatter="formatLevel" label="等级"></el-table-column>
-      <el-table-column prop="status" :formatter="formatStatus" label="是否启用"></el-table-column>
-      <el-table-column prop="appid" label="小程序appid"></el-table-column>
-      <el-table-column prop="ctime" label="日期"></el-table-column>
-      <el-table-column prop="id" label="操作">
+      <el-table-column prop="status" :formatter="formatStatus" label="状态"></el-table-column>
+      <el-table-column prop="ctime" label="创建日期"></el-table-column>
+      <el-table-column label="操作">
         <template slot-scope="scope">
-          <router-link :to="{name:'PlaceAdd',params:{id: scope.row.id, row: scope.row}}">
+          <router-link :to="{name:'RoleAdd',params:{id: scope.row.id, row: scope.row}}">
             <el-button type="primary" size="small">编辑</el-button>
           </router-link>
+          <el-button type="primary" size="small" @click="del(scope.row.id, scope.$index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -27,7 +24,7 @@
 
 <script>
   export default {
-    name: 'PlaceList',
+    name: 'RoleList',
     data() {
       return {
         name: '',
@@ -42,43 +39,11 @@
           currentPage: pagerObj.currentPage,
           pageSize: pagerObj.pageSize
         }
-        console.log(params)
-        let that = this
-        that.$axios.get('/admin/place/list', {params: params}).then(function (res) {
-          console.log(`查询ok`)
-          if (res.status === 200 && res.data.code === 200) {
-            that.tableData = res.data.data.tableData
-            that.totalNum = res.data.data.totalNum
-          } else {
-            that.tableData = []
-            that.totalNum = 0
-          }
-        }).catch((error) => {
-          console.log(`查询err: ${error}`)
-          that.tableData = []
-          that.totalNum = 0
-        })
+        this.query(this, params)
       },
       search() {
-        let params = {
-          name: this.name
-        }
-        console.log(params)
-        let that = this
-        that.$axios.get('/admin/place/list', {params: params}).then(function (res) {
-          console.log(`查询ok`)
-          if (res.status === 200 && res.data.code === 200) {
-            that.tableData = res.data.data.tableData
-            that.totalNum = res.data.data.totalNum
-          } else {
-            that.tableData = []
-            that.totalNum = 0
-          }
-        }).catch((error) => {
-          console.log(`查询err: ${error}`)
-          that.tableData = []
-          that.totalNum = 0
-        })
+        let params = {name: this.name}
+        this.query(this, params)
       },
       del(val, index) {
         let that = this
@@ -87,7 +52,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          that.$axios.get('/admin/user/delete/' + val).then(function (res) {
+          that.$axios.get('/admin/role/delete/' + val).then(function (res) {
             if (res.status === 200 && res.data.code === 200) {
               that.tableData.splice(index, 1)
               that.$message({type: 'success', message: '删除成功!'})
@@ -99,22 +64,6 @@
           that.$message({type: 'info', message: '已取消删除'})
         })
       },
-      formatLevel(row, column, cellValue) {
-        let text = ''
-        let level = row.level
-        if (level === 1) {
-          text = '1A'
-        } else if (level === 2) {
-          text = '2A'
-        } else if (level === 3) {
-          text = '3A'
-        } else if (level === 4) {
-          text = '4A'
-        } else if (level === 5) {
-          text = '5A'
-        }
-        return text
-      },
       formatStatus(row, column, cellValue) {
         let text = ''
         let status = row.status
@@ -124,16 +73,26 @@
           text = '禁用'
         }
         return text
+      },
+      query(that, params) {
+        console.log(params)
+        that.$axios.get('/admin/role/list', {params: params}).then(function (res) {
+          if (res.status === 200 && res.data.code === 200) {
+            that.tableData = res.data.data.tableData
+            that.totalNum = res.data.data.totalNum
+          } else {
+            that.tableData = []
+            that.totalNum = 0
+          }
+        }).catch((error) => {
+          console.log(`查询err: ${error}`)
+          that.tableData = []
+          that.totalNum = 0
+        })
       }
     },
     mounted() {
-      let that = this
-      that.$axios.get('/admin/place/list').then(function (res) {
-        if (res.status === 200 && res.data.code === 200) {
-          that.tableData = res.data.data.tableData
-          that.totalNum = res.data.data.totalNum
-        }
-      })
+      this.query(this, {})
     }
   }
 </script>

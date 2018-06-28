@@ -1,5 +1,5 @@
 /**
- * 用户信息
+ * 用户管理
  */
 
 const BaseModel = require('./BaseModel');
@@ -81,7 +81,6 @@ class UserModel extends BaseModel {
         let execParam = self.getExecParamByOption(sql, params.mobile);
         self.execSql(execParam, cb);
     }
-
 
     filterName(params, cb) {
         let self = this;

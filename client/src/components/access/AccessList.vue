@@ -1,16 +1,15 @@
 <template>
   <div>
     <el-row :gutter="10">
-      <el-input v-model="placeName" placeholder="景区名称"></el-input>
-      <el-input v-model="name" placeholder="用户姓名"></el-input>
+      <el-input v-model="name" placeholder="菜单名称"></el-input>
       <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
     </el-row>
     <hr>
     <el-table :data="tableData">
-      <el-table-column prop="placeName" label="景区名称"></el-table-column>
+      <el-table-column prop="name" label="菜单名称"></el-table-column>
       <el-table-column :formatter="formatType" label="票类型"></el-table-column>
-      <el-table-column prop="cname" label="票分类"></el-table-column>
-      <el-table-column prop="userName" :formatter="formatName" width="130" label="旅行社/旅游行业企业/从业者/司机"></el-table-column>
+      <el-table-column prop="url" label="url"></el-table-column>
+      <el-table-column prop="parendId" label="父"></el-table-column>
       <el-table-column prop="unit" label="单价/元"></el-table-column>
       <el-table-column prop="minpeople" label="最少人数"></el-table-column>
       <el-table-column prop="maxpeople" label="最多人数"></el-table-column>

@@ -1,25 +1,49 @@
 <template>
   <div>
     <el-row :gutter="10">
-      <el-input v-model="name" placeholder="旅行社名称"></el-input>
+      <el-input v-model="username" placeholder="用户名"></el-input>
+      <el-input v-model="roleName" placeholder="角色名"></el-input>
       <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
+      <el-button type="primary" icon="el-icon-circle-plus-outline" @click="add">添加</el-button>
     </el-row>
+    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible">
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="150px" class="demo-ruleForm">
+        <el-form-item label="用户名" :label-width="formLabelWidth" prop="userId">
+          <el-select v-model="ruleForm.userId">
+            <el-option
+              v-for="item in userOpt"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="角色名" :label-width="formLabelWidth" prop="roleId">
+          <el-select v-model="ruleForm.roleId">
+            <el-option
+              v-for="item in roleOpt"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="save('ruleForm')">保 存</el-button>
+      </div>
+    </el-dialog>
     <hr>
     <el-table :data="tableData">
-      <el-table-column prop="name" label="名称"></el-table-column>
-      <el-table-column prop="income" label="充值金额/元"></el-table-column>
-      <el-table-column prop="rechargeTime" label="充值时间"></el-table-column>
-      <el-table-column prop="time" label="创建时间"></el-table-column>
-      <el-table-column prop="operatorName" label="操作者"></el-table-column>
-      <el-table-column :formatter="formatStatus" label="审核状态"></el-table-column>
+      <el-table-column prop="username" label="用户名"></el-table-column>
+      <el-table-column prop="userStatus" :formatter="formatUserStatus" label="用户状态"></el-table-column>
+      <el-table-column prop="roleName" label="角色名"></el-table-column>
+      <el-table-column prop="roleStatus" :formatter="formatRoleStatus" label="角色状态"></el-table-column>
+      <el-table-column prop="ctime" label="创建时间"></el-table-column>
       <el-table-column width="150" label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" size="small"
-                     @click="authStatus(scope.row.id, scope.$index, 'pass', scope.row.status)">通过
-          </el-button>
-          <el-button type="danger" size="small"
-                     @click="authStatus(scope.row.id, scope.$index, 'nopass', scope.row.status)">拒绝
-          </el-button>
+          <el-button type="danger" size="small" @click="del(scope.row, scope.$index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -29,10 +53,24 @@
 
 <script>
   export default {
-    name: 'PrepayList',
+    name: 'UserRoleList',
     data() {
       return {
-        name: '',
+        username: '',
+        roleName: '',
+        dialogTitle: '添加用户的角色',
+        dialogFormVisible: false,
+        formLabelWidth: 130,
+        ruleForm: {
+          userId: '',
+          roleId: ''
+        },
+        rules: {
+          userId: [{required: true, message: '请选择', trigger: 'blur'}],
+          roleId: [{required: true, message: '请选择', trigger: 'blur'}]
+        },
+        userOpt: [],
+        roleOpt: [],
         tableData: [],
         totalNum: 0
       }
@@ -40,62 +78,96 @@
     methods: {
       getTablePageData(pagerObj) {
         let params = {
-          name: this.name,
+          username: this.username,
+          roleName: this.roleName,
           currentPage: pagerObj.currentPage,
-          pageSize: pagerObj.pageSize
+          pageSize: pagerObj.pageSize,
+          timestamp: new Date().getTime()
         }
         this.query(this, params)
       },
       search() {
         let params = {
-          name: this.name
+          username: this.username,
+          roleName: this.roleName,
+          timestamp: new Date().getTime()
         }
         this.query(this, params)
       },
-      authStatus(val, index, status, currentStatus) {
+      add() {
         let that = this
-        if (currentStatus === 1) {
-          return that.$message({type: 'error', message: '已经审核通过，不能在修改'})
+        that.dialogFormVisible = true
+      },
+      save(formName) {
+        let that = this
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            let form = that.ruleForm
+            console.log(form)
+            let url = '/admin/userRole/add'
+            that.$axios.post(url, form).then(function (res) {
+              if (res.status === 200 && res.data.code === 200) {
+                that.$message({type: 'success', message: '保存成功'})
+                that.query(that, {})
+                that.dialogFormVisible = false
+              } else {
+                that.$message({type: 'error', message: '保存失败!'})
+              }
+            }).catch(function (err) {
+              console.log('查询err:')
+              console.log(err)
+              that.$message({type: 'error', message: '保存失败'})
+            })
+          }
+        })
+      },
+      del(val, index) {
+        let that = this
+        let params = {
+          userId: val.userId,
+          roleId: val.roleId,
+          timestamp: new Date().getTime()
         }
-        if (!val || !status) {
-          return that.$message({type: 'info', message: '此条数据有错误'})
-        }
-        that.$confirm('请仔细审核, 是否继续?', '提示', {
+        that.$confirm('此操作将永久删除, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          that.$axios.get('/admin/prepay/auth?id=' + val + '&status=' + status).then(function (res) {
+          that.$axios.get('/admin/userRole/del', {params: params}).then(function (res) {
             if (res.status === 200 && res.data.code === 200) {
-              if (status === 'pass') {
-                that.tableData[index].status = 1
-              } else {
-                that.tableData[index].status = 5
-              }
-              that.$message({type: 'success', message: '提交成功!'})
+              that.tableData.splice(index, 1)
+              that.$message({type: 'success', message: '删除成功!'})
             } else {
-              that.$message({type: 'error', message: '提交失败'})
+              that.$message({type: 'error', message: '删除失败'})
             }
           })
         }).catch(() => {
-          that.$message({type: 'info', message: '已取消提交'})
+          that.$message({type: 'info', message: '已取消删除'})
         })
       },
-      formatStatus(row, column, cellValue) {
+      formatUserStatus(row, column, cellValue) {
         let text = ''
-        let status = row.status
+        let status = row.userStatus
         if (status === 1) {
-          text = '通过'
-        } else if (status === 5) {
-          text = '拒绝'
+          text = '可用'
         } else {
-          text = '提交审核'
+          text = '禁用'
+        }
+        return text
+      },
+      formatRoleStatus(row, column, cellValue) {
+        let text = ''
+        let status = row.roleStatus
+        if (status === 1) {
+          text = '可用'
+        } else {
+          text = '禁用'
         }
         return text
       },
       query(that, params) {
         console.log(params)
-        that.$axios.get('/admin/prepay/list', {params: params}).then(function (res) {
+        that.$axios.get('/admin/userRole/list', {params: params}).then(function (res) {
           console.log(`查询ok`)
           if (res.status === 200 && res.data.code === 200) {
             that.tableData = res.data.data.tableData
@@ -112,7 +184,32 @@
       }
     },
     mounted() {
+      let that = this
       this.query(this, {})
+      that.$axios.get('/admin/user/allUser').then(function (res) {
+        console.log(`查询ok`)
+        if (res.status === 200 && res.data.code === 200) {
+          that.userOpt = res.data.data.map(function (item) {
+            return {value: item.id, label: item.username}
+          })
+        } else {
+          that.userOpt = []
+        }
+      }).catch((error) => {
+        console.log(`查询err: ${error}`)
+      })
+      that.$axios.get('/admin/role/getAll').then(function (res) {
+        console.log(`查询ok`)
+        if (res.status === 200 && res.data.code === 200) {
+          that.roleOpt = res.data.data.map(function (item) {
+            return {value: item.id, label: item.name}
+          })
+        } else {
+          that.roleOpt = []
+        }
+      }).catch((error) => {
+        console.log(`查询err: ${error}`)
+      })
     }
   }
 </script>

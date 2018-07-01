@@ -29,8 +29,8 @@ router.post('/password', function (req, res, next) {
     new UserController(req).password(req, res, next);
 });
 
-router.get('/orgName/:orgName', function (req, res, next) {
-    new UserController(req).orgName(req, res, next);
+router.get('/allUser', function (req, res, next) {
+    new UserController(req).allUser(req, res, next);
 });
 
 router.get('/name/:name', function (req, res, next) {

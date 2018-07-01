@@ -12,11 +12,11 @@ class UserModel extends BaseModel {
 
     // 预付费列表
     list(params, page, pageSize, cb) {
-        let con = '';
         let self = this;
         let sql = '';
         let countSql = '';
         if (params.table === 'menu') {
+            let con = '';
             if (params.name) {
                 con += ` where m.name like ${mysql.escape('%' + params.name + '%')} `;
             }
@@ -27,15 +27,25 @@ class UserModel extends BaseModel {
                    ${con} order by m.sort limit ?,?`;
             countSql = `SELECT count(*) as count FROM ${self.baseDb}menu as m ${con}`;
         } else {
+            let con = [];
             if (params.name) {
-                con += ` where e.name like ${mysql.escape('%' + params.name + '%')} `;
+                con.push(` e.name like ${mysql.escape('%' + params.name + '%')} `);
+            }
+            if (params.menuName) {
+                con.push(` m.name like ${mysql.escape('%' + params.menuName + '%')} `);
+            }
+            if(con.length>0){
+                con = ' where ' + con.join(' and ');
+            }else{
+                con = '';
             }
             sql = `SELECT e.id,e.name,e.code,e.status,e.menuId,m.name as menuName,
                    DATE_FORMAT(m.ctime,"%Y-%m-%d %H:%i:%s") as ctime
                    FROM ${self.baseDb}element as e
                    LEFT JOIN ${self.baseDb}menu as m ON e.menuId=m.id           
                    ${con} order by e.menuId desc limit ?,?`;
-            countSql = `SELECT count(*) as count FROM ${self.baseDb}element as e ${con}`;
+            countSql = `SELECT count(*) as count  FROM ${self.baseDb}element as e
+                   LEFT JOIN ${self.baseDb}menu as m ON e.menuId=m.id ${con}`;
         }
 
         let execParam = self.getExecParamByOption(sql, [(page - 1) * pageSize, pageSize]);

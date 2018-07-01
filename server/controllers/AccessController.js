@@ -21,11 +21,15 @@ class Controller extends BaseController {
     list(req, res, next) {
         let self = this;
         let name = req.query.name ? req.query.name.trim() : '';
+        let menuName = req.query.menuName ? req.query.menuName.trim() : '';
         let type = req.query.type || '1';
         console.log(typeof(type))
         let params = {};
         if (name) {
             params.name = name;
+        }
+        if (menuName) {
+            params.menuName = menuName;
         }
         params.table = (type === '1') ? 'menu' : 'element';
         let page = parseInt(req.query.currentPage || 1);

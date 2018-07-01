@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-row :gutter="10">
+      <el-input v-model="menuName" placeholder="菜单名称"></el-input>
       <el-input v-model="name" placeholder="元素名称"></el-input>
       <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
     </el-row>
@@ -22,7 +23,7 @@
     data() {
       return {
         name: '',
-        placeName: '',
+        menuName: '',
         tableData: [],
         totalNum: 0
       }
@@ -31,14 +32,14 @@
       getTablePageData(pagerObj) {
         let params = {
           name: this.name,
-          placeName: this.placeName,
+          menuName: this.menuName,
           currentPage: pagerObj.currentPage,
           pageSize: pagerObj.pageSize
         }
         this.query(this, params)
       },
       search() {
-        let params = {name: this.name, placeName: this.placeName}
+        let params = {name: this.name, menuName: this.menuName}
         this.query(this, params)
       },
       formatStatus(row, column, cellValue) {
@@ -60,9 +61,6 @@
           text = '否'
         }
         return text
-      },
-      formatName(row, column, cellValue) {
-        return row.userName ? row.userName + '_' + row.mobile : ''
       },
       query(that, params) {
         console.log(params)

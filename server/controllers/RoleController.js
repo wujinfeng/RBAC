@@ -42,7 +42,7 @@ class RoleController extends BaseController {
                 logger.error(err);
                 res.json({code: 500, msg: err, data: []});
             } else {
-                res.json({code: 200, msg: '', data: data});
+                res.json({code: 200, msg: 'ok', data: data});
             }
         });
     }

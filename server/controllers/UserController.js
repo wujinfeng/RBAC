@@ -49,7 +49,7 @@ class UserController extends BaseController {
         });
     }
 
-    // 景区用户
+    // 用户
     list(req, res, next) {
         let self = this;
         let username = req.query.username ? req.query.username.trim() : '';
@@ -149,6 +149,18 @@ class UserController extends BaseController {
                     return res.json({code: 500, msg: '已经存在'});
                 }
                 res.json({code: 200, msg: ''});
+            }
+        });
+    }
+
+    allUser(req, res) {
+        let self = this;
+        self.userModel.allUser((err, result) => {
+            if (err) {
+                logger.error(err);
+                res.json({code: 500, msg: err});
+            } else {
+                res.json({code: 200, msg: 'ok', data: result});
             }
         });
     }

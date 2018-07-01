@@ -81,16 +81,13 @@ class UserModel extends BaseModel {
         self.execSql(execParam, cb);
     }
 
-    getUserRole(cb){
+    allUser(callback) {
         let self = this;
-        let sql = `select ur.userId,ur.roleId,u.phone, u.username, u.status as userStatus,
-            r.name as roleName,r.status as roleStatus from ${self.baseDb}user_role as ur
-            left join  ${self.baseDb}user as u on ur.userId=u.id
-            left join  ${self.baseDb}role as r on ur.roleId=r.id                
-        `;
+        let sql = `SELECT b.id,b.username FROM ${self.baseDb}user b`;
         let execParam = self.getExecParamByOption(sql, '');
-        self.execSql(execParam, cb);
+        self.execSql(execParam, callback);
     }
+
 }
 
 module.exports = UserModel;

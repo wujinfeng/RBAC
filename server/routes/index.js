@@ -5,6 +5,7 @@ module.exports = function (app) {
     app.use('/admin/userRole', require('./userRole'));  // 用户角色
     app.use('/admin/role', require('./role')); // 角色
     app.use('/admin/access', require('./access'));   // 权限
+    app.use('/admin/roleAccess', require('./roleAccess'));   // 角色权限
     app.use('/admin/log', require('./log'));   // 日志
     app.use('/admin/coupon', require('./coupon')); // 优惠券活动
 

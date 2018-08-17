@@ -1,25 +1,21 @@
 <template>
   <div>
     <el-row :gutter="10">
-      <el-input v-model="name" placeholder="姓名"></el-input>
+      <el-input v-model="name" placeholder="角色名称"></el-input>
       <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
     </el-row>
     <hr>
     <el-table :data="tableData">
-      <el-table-column prop="name" label="姓名"></el-table-column>
-      <el-table-column prop="parentName" label="景区"></el-table-column>
-      <el-table-column prop="mobile" label="手机号"></el-table-column>
-      <el-table-column prop="sex" :formatter="formatSex" label="性别"></el-table-column>
-      <el-table-column prop="status" :formatter="formatStatus" label="状态"></el-table-column>
-      <el-table-column prop="time" label="创建日期"></el-table-column>
+      <el-table-column prop="name" label="角色名称"></el-table-column>
+      <el-table-column label="权限">
+        <template slot-scope="scope">
+          <el-tree :data="tree" :props="defaultProps"></el-tree>
+        </template>
+      </el-table-column>
+      <el-table-column prop="uptime" label="更新日期"></el-table-column>
       <el-table-column prop="id" label="操作">
         <template slot-scope="scope">
-          <router-link :to="{name:'RoleAdd',params:{id: scope.row.id, row: scope.row}}">
-            <el-button type="primary" size="small">编辑</el-button>
-          </router-link>
-          <router-link :to="{name:'Password',params:{id: scope.row.id, mobile: scope.row.mobile}}">
-            <el-button type="warning" size="small" title="修改密码">改密</el-button>
-          </router-link>
+          <el-button type="primary" size="small">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -34,6 +30,32 @@
       return {
         name: '',
         tableData: [],
+        defaultProps: {
+          children: 'children',
+          label: 'name'
+        },
+        tree: [{
+          label: '一级 1',
+          children: [{
+            label: '二级 1-1',
+            children: [{
+              label: '三级 1-1-1'
+            }]
+          }]
+        }, {
+          label: '一级 2',
+          children: [{
+            label: '二级 2-1',
+            children: [{
+              label: '三级 2-1-1'
+            }]
+          }, {
+            label: '二级 2-2',
+            children: [{
+              label: '三级 2-2-1'
+            }]
+          }]
+        }],
         totalNum: 0
       }
     },
@@ -95,7 +117,7 @@
       },
       query(that, params) {
         console.log(params)
-        that.$axios.get('/admin/user/placeUserList', {params: params}).then(function (res) {
+        that.$axios.get('/admin/roleAccess/list', {params: params}).then(function (res) {
           console.log(`查询ok`)
           if (res.status === 200 && res.data.code === 200) {
             that.tableData = res.data.data.tableData

@@ -6,7 +6,7 @@
     </el-row>
     <hr>
     <el-table :data="tableData">
-      <el-table-column prop="name" label="角色名称"></el-table-column>
+      <el-table-column prop="roleName" label="角色名称"></el-table-column>
       <el-table-column label="权限">
         <template slot-scope="scope">
           <el-tree :data="tree" :props="defaultProps"></el-tree>
@@ -32,7 +32,7 @@
         tableData: [],
         defaultProps: {
           children: 'children',
-          label: 'name'
+          label: 'label'
         },
         tree: [{
           label: '一级 1',

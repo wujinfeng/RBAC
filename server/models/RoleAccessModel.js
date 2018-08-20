@@ -7,21 +7,26 @@ const mysql = require('mysql');
 
 class RoleAccessModel extends BaseModel {
 
-    // 分页列表
+    // 分页列表，展示菜单
     list(params, page, pageSize, cb) {
         let con = '';
         let self = this;
         if (params.name) {
-            con = ` where b.name like ${mysql.escape('%' + params.name + '%')} `;
+            con = ` where r.name like ${mysql.escape('%' + params.name + '%')} `;
         }
-        let sql = `select b.id,b.name,b.status,DATE_FORMAT(b.ctime, "%Y-%m-%d %H:%i:%s") as ctime from ${self.baseDb}role as b ${con} order by b.ctime desc limit ?,?`;
+        let sql = `SELECT r.id as roleId, r.name as roleName, ra.accessId, ra.type,
+            DATE_FORMAT(ra.uptime, "%Y-%m-%d %H:%i:%s") as uptime,
+            m.name AS menuName,m.parentId,m.sort,m.isLeaf
+            FROM (SELECT r.id,r.name FROM ${self.baseDb}role as r ${con} ORDER BY r.id DESC LIMIT ?,?) as r 
+            LEFT JOIN ${self.baseDb}role_access as ra ON r.id=ra.roleId and ra.type=1
+            LEFT JOIN ${self.baseDb}menu as m ON ra.accessId=m.id ORDER BY m.sort ASC`;
         let execParam = self.getExecParamByOption(sql, [(page - 1) * pageSize, pageSize]);
         self.execSql(execParam, function (err, rows) {
             console.log(rows);
             if (err) {
                 return cb(err);
             }
-            let countSql = `select count(*) as count from ${self.baseDb}role as b ${con}`;
+            let countSql = `select count(*) as count FROM ${self.baseDb}role as r ${con}`;
             let execParam2 = self.getExecParamByOption(countSql, '');
             self.execSql(execParam2, (err, count) => {
                 if (err) {
@@ -32,71 +37,48 @@ class RoleAccessModel extends BaseModel {
         });
     }
 
-    // 获取所有角色
-    getAll(cb) {
+    // 获取一个角色的菜单权限
+    getMenu(roleId, cb) {
         let self = this;
-        let sql = `select b.id,b.name,b.status from ${self.baseDb}role as b order by b.ctime DESC`;
-        let execParam = self.getExecParamByOption(sql, '');
-        self.execSql(execParam, cb);
-    }
-
-    // 按照id查询角色
-    getRoleById(id, cb) {
-        let self = this;
-        let sql = `select id,name,status,DATE_FORMAT(ctime, "%Y-%m-%d %H:%i:%s") as ctime from ${self.baseDb}role where id=?`;
-        let execParam = self.getExecParamByOption(sql, id);
-        self.execSql(execParam, cb);
-    }
-
-    // 按名称查询角色
-    getRoleByName(name, cb) {
-        let self = this;
-        let sql = `select id,name,status from ${self.baseDb}role where name like ?`;
-        let execParam = self.getExecParamByOption(sql, `%${name}%`);
-        self.execSql(execParam, cb);
-    }
-
-    // 获取一个角色的所有权限
-    getAccessByRoleId(roleId, cb) {
-        let self = this;
-        // 菜单权限
         let sqlMenu = `SELECT ra.roleId,ra.accessId,m.name,
          DATE_FORMAT(ra.ctime, "%Y-%m-%d %H:%i:%s") as ctime
          FROM ${self.baseDb}role_access ra
-         LEFT JOIN ${self.baseDb}menu m ON ra.accessId=m.id and ra.type=1`;
-        // 元素权限
-        let sqlElement = `SELECT ra.roleId,ra.accessId,e.name,
-         DATE_FORMAT(ra.ctime, "%Y-%m-%d %H:%i:%s") as ctime
-         FROM ${self.baseDb}role_access ra
-         LEFT JOIN ${self.baseDb}element e ON ra.accessId=e.id and ra.type=2`;
+         LEFT JOIN ${self.baseDb}menu m ON ra.accessId=m.id where ra.type=1`;
         let execParam = self.getExecParamByOption(sqlMenu);
-        self.execSql(execParam, function (err) {
-            if (err) {
-                cb(err);
-            } else {
-                let execParam = self.getExecParamByOption(sqlElement);
-                self.execSql(execParam, cb);
-            }
-        });
-    }
-
-    edit(id, data, cb) {
-        let self = this;
-        let sql = `update ${self.baseDb}role set ? where id=?`;
-        let execParam = self.getExecParamByOption(sql, [data, id]);
         self.execSql(execParam, cb);
     }
 
+    // 获取一个角色的元素权限
+    getEle(roleId, cb) {
+        let self = this;
+        let sqlElement = `SELECT ra.roleId,ra.accessId,e.name,
+         DATE_FORMAT(ra.ctime, "%Y-%m-%d %H:%i:%s") as ctime
+         FROM ${self.baseDb}role_access ra
+         LEFT JOIN ${self.baseDb}element e ON ra.accessId=e.id where ra.type=2`;
+        let execParam = self.getExecParamByOption(sqlElement);
+        self.execSql(execParam, cb);
+    }
+
+    // 查询是否存在
+    isExist(params, cb) {
+        let self = this;
+        let sql = `select count(*) as count ${self.baseDb}role_access where roleId=? and accessId=? and type=?`;
+        let execParam = self.getExecParamByOption(sql, [params.roleId, params.accessId, params.type]);
+        self.execSql(execParam, cb);
+    }
+
+    // 添加
     add(params, cb) {
         let self = this;
-        let sql = `insert into ${self.baseDb}role set ?`;
+        let sql = `insert into ${self.baseDb}role_access set ?`;
         let execParam = self.getExecParamByOption(sql, params);
         self.execSql(execParam, cb);
     }
 
+    // 删除
     del(id, cb) {
         let self = this;
-        let sql = `delete from ${self.baseDb}role where id=?`;
+        let sql = `delete from ${self.baseDb}role_access where id=?`;
         let execParam = self.getExecParamByOption(sql, id);
         self.execSql(execParam, cb);
     }

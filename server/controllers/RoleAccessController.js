@@ -13,7 +13,7 @@ class RoleAccessController extends BaseController {
      */
     constructor(req) {
         super(req);
-        this.role = new RoleAccessModel();
+        this.roleAccess = new RoleAccessModel();
     }
 
     list(req, res) {
@@ -25,35 +25,33 @@ class RoleAccessController extends BaseController {
         }
         let page = parseInt(req.query.currentPage || 1);
         let pageSize = parseInt(req.query.pageSize || 10);
-        self.role.list(params, page, pageSize, (err, data, count) => {
+        self.roleAccess.list(params, page, pageSize, (err, data, count) => {
             if (err) {
                 logger.error(err);
                 res.json({code: 500, msg: err, data: []});
             } else {
+                console.log(data);
+                let roleArr = [];
+                for(let i=0; i<data.length; i++){
+                    let obj = {};
+                    obj.roleName = data[i].roleName;
+                    if(obj.parentId === 0){
+
+                    }
+                }
+
                 res.json({code: 200, msg: '', data: {tableData: data, totalNum: count}});
             }
         });
     }
 
-    getAll(req, res) {
+    getMenu(req, res) {
         let self = this;
-        self.role.getAll((err, data) => {
-            if (err) {
-                logger.error(err);
-                res.json({code: 500, msg: err, data: []});
-            } else {
-                res.json({code: 200, msg: 'ok', data: data});
-            }
-        });
-    }
-
-    getRoleById(req, res) {
-        let self = this;
-        let id = req.params.id ? req.params.id.trim() : '';
-        if (!id) {
-            return res.json({code: 400, msg: 'id not found', data: []});
+        let roleId = req.query.roleId;
+        if (!roleId) {
+            return res.json({code: 400, msg: 'roleId not found', data: []});
         }
-        self.role.getRoleById(id, (err, data) => {
+        self.roleAccess.getMenu(roleId, (err, data) => {
             if (err) {
                 logger.error(err);
                 res.json({code: 500, msg: err, data: []});
@@ -63,14 +61,13 @@ class RoleAccessController extends BaseController {
         });
     }
 
-    // 名字模糊查询
-    getRoleByName(req, res) {
+    getEle(req, res) {
         let self = this;
-        let name = req.params.name ? req.params.name.trim() : '';
-        if (!name) {
-            return res.json({code: 400, msg: 'id not found', data: []});
+        let roleId = req.query.roleId;
+        if (!roleId) {
+            return res.json({code: 400, msg: 'roleId not found', data: []});
         }
-        self.role.getRoleByName(name, (err, data) => {
+        self.roleAccess.getEle(roleId, (err, data) => {
             if (err) {
                 logger.error(err);
                 res.json({code: 500, msg: err, data: []});
@@ -84,7 +81,7 @@ class RoleAccessController extends BaseController {
         console.log(req.body)
         let self = this;
         let data = bodyData(req.body);
-        self.role.add(data, (err) => {
+        self.roleAccess.add(data, (err) => {
             if (err) {
                 logger.error('添加出错');
                 logger.error(err);
@@ -95,37 +92,6 @@ class RoleAccessController extends BaseController {
         });
     }
 
-    edit(req, res) {
-        let self = this;
-        let id = req.body.id;
-        let data = bodyData(req.body);
-        self.role.edit(id, data, (err) => {
-            if (err) {
-                logger.error('编辑出错');
-                logger.error(err);
-                res.json({code: 500, msg: err});
-            } else {
-                res.json({code: 200, msg: ''});
-            }
-        });
-    }
-
-    del(req, res) {
-        let self = this;
-        let id = req.params.id;
-        if (!id) {
-            return res.json({code: 400, msg: 'not found params'});
-        }
-        self.role.del(id, (err) => {
-            if (err) {
-                logger.error('出错');
-                logger.error(err);
-                res.json({code: 500, msg: err});
-            } else {
-                res.json({code: 200, msg: ''});
-            }
-        });
-    }
 }
 
 function bodyData(body) {

@@ -25,7 +25,7 @@
 
 <script>
   export default {
-    name: 'PlaceUserList',
+    name: 'RoleAccessList',
     data() {
       return {
         name: '',

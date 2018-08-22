@@ -68,9 +68,74 @@ let getPoolSer = function (db, cb) {
     }
 };
 
+// 菜单格式化
+/*let arr = [
+    {id: 1, name: 'a1', parentId: 0},
+    {id: 2, name: 'a1-2', parentId: 1},
+    {id: 3, name: 'a1-3', parentId: 1},
+    {id: 4, name: 'a1-2-4', parentId: 2},
+    {id: 5, name: 'a1-2-5', parentId: 2},
+    {id: 6, name: 'a6', parentId: 0},
+    {id: 7, name: 'a6-7', parentId: 6},
+    {id: 8, name: 'a6-8', parentId: 6},
+    {id: 14, name: 'a1-2-4-14', parentId: 4},
+    {id: 15, name: 'a1-2-4-15', parentId: 4}
+];
+输出
+
+
+
+*/
+
+let formatMenu = function(arr){
+    let data = [];
+    let tree = [];
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].parentId !== 0) {
+            for (let j = 0; j < arr.length; j++) {
+                if (arr[i].parentId === arr[j].id) {
+                    let isExist = false;
+                    for (let k = 0; k < tree.length; k++) {
+                        if (tree[k].id === arr[j].id) {
+                            isExist = true;
+                            let isChildrenExist = false;
+                            for (let m = tree[k].children.length - 1; m >= 0; m--) {  // 防止children子元素重复多个
+                                if (tree[k].children[m].id === arr[i].id) {
+                                    isChildrenExist = true;
+                                    break;
+                                }
+                            }
+                            if (!isChildrenExist) {
+                                tree[k].children.push(arr[i]);
+                            }
+                            break;
+                        }
+                    }
+                    if (!isExist) {
+                        arr[j].children = [];
+                        arr[j].children.push(arr[i]);
+                        tree.push(arr[j]);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    for(let i=0; i<tree.length; i++){
+        if(tree[i].parentId === 0){
+            data.push(tree[i])
+        }
+    }
+    console.log(JSON.stringify(tree))
+    console.log(JSON.stringify(data))
+    return data;
+};
+
 //导出
 module.exports = {
     md5: md5,
+    formatMenu: formatMenu,
     execSql: execSql,
     getPoolSer: getPoolSer,
 };

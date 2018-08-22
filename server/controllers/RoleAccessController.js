@@ -1,6 +1,7 @@
 /**
  * 角色权限管理
  */
+const comm = require('../middlewares/comm');
 const BaseController = require('./BaseController');
 const RoleAccessModel = require('../models/RoleAccessModel');
 let config = require('../config/config').getInstance().config;
@@ -31,16 +32,54 @@ class RoleAccessController extends BaseController {
                 res.json({code: 500, msg: err, data: []});
             } else {
                 console.log(data);
-                let roleArr = [];
-                for(let i=0; i<data.length; i++){
-                    let obj = {};
-                    obj.roleName = data[i].roleName;
-                    if(obj.parentId === 0){
-
+                let arr = [];
+                let roledIdArr = [];
+                for (let i = 0; i < data.length; i++) {
+                    let access = {
+                        id: data[i].id,
+                        parentId: data[i].parentId,
+                        menuName: data[i].menuName,
+                        sort: data[i].sort,
+                        isLeaf: data[i].isLeaf
+                    };
+                    let isExist = false;
+                    let isExistIndex = '';
+                    for (let j = 0; j < arr.length; j++) {
+                        if (arr[j].roleId === data[i].roleId) {
+                            isExist = true;
+                            isExistIndex = j;
+                            break;
+                        }
+                    }
+                    if (isExist) {
+                        arr[isExistIndex].accessArr.push(access)
+                    } else {
+                        arr.push({
+                            roleName: data[i].roleName,
+                            roleId: data[i].roleId,
+                            uptime: data[i].uptime,
+                            accessArr: [access]
+                        });
                     }
                 }
-
-                res.json({code: 200, msg: '', data: {tableData: data, totalNum: count}});
+                console.log('arr', arr);
+                let hasAccessArr = [];
+                let noAccessArr = [];
+                for (let i = 0; i < arr.length; i++) {
+                    let accessArr = arr[i].accessArr;
+                    for(let j=0; j<accessArr.length; j++){
+                        if (accessArr[j].id) {
+                            hasAccessArr.push(accessArr[j])
+                        }
+                    }
+                    console.log('hasAccessArr', hasAccessArr);
+                    let tree = comm.formatMenu(hasAccessArr);
+                    console.log('data', tree)
+                    arr[i].tree = tree;
+                    delete arr[i].accessArr;
+                }
+                console.log('arr2', JSON.stringify(arr))
+                res.json({code: 200, msg: '', data: {tableData: arr, totalNum: count}});
             }
         });
     }

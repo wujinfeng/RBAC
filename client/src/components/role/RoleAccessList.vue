@@ -9,7 +9,7 @@
       <el-table-column prop="roleName" label="角色名称"></el-table-column>
       <el-table-column label="权限">
         <template slot-scope="scope">
-          <el-tree :data="tree" :props="defaultProps"></el-tree>
+          <el-tree :data="scope.row.tree" :props="defaultProps"></el-tree>
         </template>
       </el-table-column>
       <el-table-column prop="uptime" label="更新日期"></el-table-column>
@@ -32,30 +32,8 @@
         tableData: [],
         defaultProps: {
           children: 'children',
-          label: 'label'
+          label: 'menuName'
         },
-        tree: [{
-          label: '一级 1',
-          children: [{
-            label: '二级 1-1',
-            children: [{
-              label: '三级 1-1-1'
-            }]
-          }]
-        }, {
-          label: '一级 2',
-          children: [{
-            label: '二级 2-1',
-            children: [{
-              label: '三级 2-1-1'
-            }]
-          }, {
-            label: '二级 2-2',
-            children: [{
-              label: '三级 2-2-1'
-            }]
-          }]
-        }],
         totalNum: 0
       }
     },

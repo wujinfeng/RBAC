@@ -16,7 +16,7 @@ class RoleAccessModel extends BaseModel {
         }
         let sql = `SELECT r.id as roleId, r.name as roleName, ra.accessId, ra.type,
             DATE_FORMAT(ra.uptime, "%Y-%m-%d %H:%i:%s") as uptime,
-            m.name AS menuName,m.parentId,m.sort,m.isLeaf
+            m.id,m.name AS menuName,m.parentId,m.sort,m.isLeaf
             FROM (SELECT r.id,r.name FROM ${self.baseDb}role as r ${con} ORDER BY r.id DESC LIMIT ?,?) as r 
             LEFT JOIN ${self.baseDb}role_access as ra ON r.id=ra.roleId and ra.type=1
             LEFT JOIN ${self.baseDb}menu as m ON ra.accessId=m.id ORDER BY m.sort ASC`;

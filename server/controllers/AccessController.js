@@ -1,6 +1,7 @@
 /**
  * Created by
  */
+const comm = require('../middlewares/comm');
 const BaseController = require('./BaseController');
 const AccessModel = require('../models/AccessModel');
 let config = require('../config/config').getInstance().config;
@@ -17,7 +18,7 @@ class Controller extends BaseController {
         this.access = new AccessModel();
     }
 
-    //预付费列表
+    //列表
     list(req, res, next) {
         let self = this;
         let name = req.query.name ? req.query.name.trim() : '';
@@ -45,8 +46,20 @@ class Controller extends BaseController {
         });
     }
 
-}
+    getAllMenuTree(req, res, next) {
+        let self = this;
+        self.access.getAllMenu((err, data) => {
+            if (err) {
+                logger.error(err);
+                res.json({code: 500, msg: err, data: []});
+            } else {
+                let row = comm.formatMenu(data);
+                res.json({code: 200, msg: '', data: row});
+            }
+        });
+    }
 
+}
 
 
 module.exports = Controller;

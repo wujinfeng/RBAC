@@ -15,11 +15,20 @@
       <el-table-column prop="uptime" label="更新日期"></el-table-column>
       <el-table-column prop="id" label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" size="small">编辑</el-button>
+          <el-button type="primary" size="small" @click="editAccess(scope.row)">编辑权限</el-button>
         </template>
       </el-table-column>
     </el-table>
     <pagination v-on:getPageData="getTablePageData" :total-num="totalNum"></pagination>
+    <!--编辑对话框-->
+    <el-dialog title="编辑" :visible.sync="dialogVisible" width="500px">
+      <el-tree :data="allMenuTree" :props="allMenuTreeProps" show-checkbox default-expand-all node-key="id"
+               ref="tree"></el-tree>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelSaveAccess()">取 消</el-button>
+        <el-button type="primary" @click="saveAccess()">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -34,6 +43,14 @@
           children: 'children',
           label: 'menuName'
         },
+        allMenuTreeProps: {
+          children: 'children',
+          label: 'menuName'
+        },
+        dialogVisible: false,
+        currentRoleId: '',
+        allMenuTree: [],
+        currentMenuTree: [],
         totalNum: 0
       }
     },
@@ -71,6 +88,24 @@
           that.$message({type: 'info', message: '已取消删除'})
         })
       },
+      editAccess(row) {
+        console.log(row.roleId)
+        let that = this
+        this.currentRoleId = row.roleId
+        this.currentMenuTree = row.tree
+        console.log(this.currentMenuTree)
+        this.dialogVisible = true
+        // 获取所有key,即id
+        let currentIdArr = that.getCurrentIdArr(that.currentMenuTree)
+        console.log(currentIdArr)
+        that.$refs.tree.setCheckedKeys(currentIdArr)
+      },
+      saveAccess() {
+        this.dialogVisible = false
+      },
+      cancelSaveAccess() {
+        this.dialogVisible = false
+      },
       formatStatus(row, column, cellValue) {
         let text = ''
         let status = row.status
@@ -78,18 +113,6 @@
           text = '在岗启用'
         } else if (status === 5) {
           text = '离岗禁用'
-        }
-        return text
-      },
-      formatSex(row, column, cellValue) {
-        let text = ''
-        let sex = row.sex
-        if (sex === 1) {
-          text = '男'
-        } else if (sex === 2) {
-          text = '女'
-        } else if (sex === 3) {
-          text = '其他'
         }
         return text
       },
@@ -109,10 +132,40 @@
           that.tableData = []
           that.totalNum = 0
         })
+      },
+      getCurrentIdArr(arr) {
+        let currentIdArr = []
+        function getId(arr) {
+          for (let i = 0; i < arr.length; i++) {
+            if (arr[i].isLeaf === 1) { // 取树子节点
+              currentIdArr.push(arr[i].id)
+            }
+            if (arr[i].children && arr[i].children.length > 0) {
+              getId(arr[i].children)
+            }
+          }
+        }
+        getId(arr)
+        return currentIdArr
+      },
+      getAllMenuTree() {
+        let that = this
+        that.$axios.get('/admin/access/allmenutree').then(function (res) {
+          console.log('allmenutree', res.data)
+          if (res.status === 200 && res.data.code === 200) {
+            that.allMenuTree = res.data.data
+          } else {
+            that.allMenuTree = []
+          }
+        }).catch((error) => {
+          console.log(`查询err: ${error}`)
+          that.allMenuTree = []
+        })
       }
     },
     mounted() {
       this.query(this, {})
+      this.getAllMenuTree()
     }
   }
 </script>

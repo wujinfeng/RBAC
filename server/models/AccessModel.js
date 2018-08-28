@@ -34,9 +34,9 @@ class UserModel extends BaseModel {
             if (params.menuName) {
                 con.push(` m.name like ${mysql.escape('%' + params.menuName + '%')} `);
             }
-            if(con.length>0){
+            if (con.length > 0) {
                 con = ' where ' + con.join(' and ');
-            }else{
+            } else {
                 con = '';
             }
             sql = `SELECT e.id,e.name,e.code,e.status,e.menuId,m.name as menuName,
@@ -62,6 +62,15 @@ class UserModel extends BaseModel {
                 cb(err, rows, count[0].count);
             });
         });
+    }
+
+    getAllMenu(cb) {
+        let self = this;
+        let sql = `SELECT m.id,m.name as menuName,m.url,m.parentId,m.sort,m.isLeaf,m.icon,m.status,
+                   DATE_FORMAT(m.ctime,"%Y-%m-%d %H:%i:%s") as ctime
+                   FROM ${self.baseDb}menu as m order by m.sort`;
+        let execParam = self.getExecParamByOption(sql, '');
+        self.execSql(execParam, cb)
     }
 
 }

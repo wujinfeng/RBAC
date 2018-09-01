@@ -78,8 +78,18 @@ class RoleAccessController extends BaseController {
     add(req, res) {
         console.log(req.body)
         let self = this;
-        let data = bodyData(req.body);
-        self.roleAccess.add(data, (err) => {
+        let roleId = req.body.roleId||'';
+        let type = req.body.type || '';
+        let accessArr = req.body.accessArr||[];
+        if(!roleId || !type || accessArr.length<1){
+           return res.json({code: 400, msg: 'params err'});
+        }
+        let params = {
+            roleId: roleId,
+            type: type,
+            accessArr: accessArr
+        };
+        self.roleAccess.add(params, (err) => {
             if (err) {
                 logger.error('添加出错');
                 logger.error(err);
@@ -90,17 +100,6 @@ class RoleAccessController extends BaseController {
         });
     }
 
-}
-
-function bodyData(body) {
-    let data = {};
-    if (body.name && body.name.trim()) {
-        data.name = body.name.trim()
-    }
-    if (body.status) {
-        data.status = body.status
-    }
-    return data;
 }
 
 module.exports = RoleAccessController;

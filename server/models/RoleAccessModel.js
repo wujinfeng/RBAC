@@ -1,7 +1,8 @@
 /**
  * 角色权限信息
  */
-
+const lodash = require('lodash');
+const async = require('async');
 const BaseModel = require('./BaseModel');
 const mysql = require('mysql');
 
@@ -62,7 +63,7 @@ class RoleAccessModel extends BaseModel {
     // 查询是否存在
     isExist(params, cb) {
         let self = this;
-        let sql = `select count(*) as count ${self.baseDb}role_access where roleId=? and accessId=? and type=?`;
+        let sql = `select count(*) as count from ${self.baseDb}role_access where roleId=? and accessId=? and type=?`;
         let execParam = self.getExecParamByOption(sql, [params.roleId, params.accessId, params.type]);
         self.execSql(execParam, cb);
     }
@@ -70,8 +71,47 @@ class RoleAccessModel extends BaseModel {
     // 添加
     add(params, cb) {
         let self = this;
-        let sql = `insert into ${self.baseDb}role_access set ?`;
+        let sql = `select accessId from ${self.baseDb}role_access where roleId=? and type=?`;
         let execParam = self.getExecParamByOption(sql, params);
+        self.execSql(execParam, (err, row)=>{
+            if(err){
+                return cb(err)
+            }
+            if(row.length>0){
+                let delArr = lodash.difference(row, params.accessArr);
+                let addArr = lodash.difference(params.accessArr, row);
+                async.parallel({
+                    delId: function (callback) {
+                        self.delArr(params, delArr,callback)
+                    },
+                    addId: function (callback) {
+                        self.insert(params, addArr, callback)
+                    }
+                },function (err) {
+                    cb(err)
+                })
+            }else{
+                self.insert(params, params.accessArr,cb)
+            }
+        });
+    }
+
+    insert(params, accessArr, cb){
+        let self = this;
+        let val = [];
+        for(let i=0; i<accessArr.length; i++){
+            val = `(${params.roleId}, ${accessArr[i]}, ${params.type})`
+        }
+        let sql = `insert into ${self.baseDb}role_access(roleId, accessId, type) values ${val.join(',')}`;
+        let execParam = self.getExecParamByOption(sql, params);
+        self.execSql(execParam, cb);
+    }
+
+    delArr(params, accessArr, cb){
+        let self = this;
+        let val = '(' + accessArr.join(',') + ')';
+        let sql = `delete from ${self.baseDb}role_access where roleId=? and type=? and accessId in ?`;
+        let execParam = self.getExecParamByOption(sql, [params.roleId, params.type, val]);
         self.execSql(execParam, cb);
     }
 

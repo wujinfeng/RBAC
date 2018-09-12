@@ -2,7 +2,7 @@
   <el-card class="box-card">
     <p class="title">票务后台管理</p>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-      <el-form-item label="手机号" prop="mobile">
+      <el-form-item label="用户名" prop="mobile">
         <el-input v-model="ruleForm.mobile"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
@@ -29,10 +29,10 @@
         },
         rules: {
           mobile: [
-            {required: true, message: '请填写手机号', trigger: 'blur'}
+            {required: true, message: '请填写用户名', trigger: 'blur'}
           ],
           password: [
-            {required: true, min: 8, max: 20, message: '长度在 8 到 20 个字符', trigger: 'blur'}
+            {required: true, min: 6, max: 30, message: '长度在 6 到 30 个字符', trigger: 'blur'}
           ]
         }
       }
@@ -43,7 +43,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             let form = {
-              mobile: that.ruleForm.mobile,
+              username: that.ruleForm.mobile,
               password: that.ruleForm.password
             }
             let url = '/admin/user/login'

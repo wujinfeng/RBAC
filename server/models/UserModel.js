@@ -16,8 +16,15 @@ class UserModel extends BaseModel {
 
     login(mobile, password, callback) {
         let self = this;
-        let sql = `SELECT b.id,b.mobile,b.username FROM ${self.baseDb}user b WHERE b.mobile=? and password=? and status=1`;
+        let sql = `SELECT b.id,b.username,DATE_FORMAT(b.uptime, "%Y-%m-%d %H:%i:%s") as uptime,b.status FROM ${self.baseDb}user b WHERE b.username=? and password=? and status=1`;
         let execParam = self.getExecParamByOption(sql, [mobile, password]);
+        self.execSql(execParam, callback);
+    }
+
+    checkUser(userId, callback) {
+        let self = this;
+        let sql = `SELECT b.id,b.username,DATE_FORMAT(b.uptime, "%Y-%m-%d %H:%i:%s") as uptime,b.status FROM ${self.baseDb}user b WHERE b.id=?`;
+        let execParam = self.getExecParamByOption(sql, userId);
         self.execSql(execParam, callback);
     }
 
@@ -69,7 +76,7 @@ class UserModel extends BaseModel {
         self.execSql(execSql, cb);
     }
 
-    // 检查手机号是否存在
+    // 检查用户名是否存在
     checkUserName(params, cb) {
         let con = '';
         if (params.pageStatus === 'edit') {
@@ -77,7 +84,7 @@ class UserModel extends BaseModel {
         }
         let self = this;
         let sql = `select id from ${self.baseDb}user where username=? ${con}`;
-        let execParam = self.getExecParamByOption(sql, params.mobile);
+        let execParam = self.getExecParamByOption(sql, params.username);
         self.execSql(execParam, cb);
     }
 

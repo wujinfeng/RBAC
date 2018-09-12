@@ -31,13 +31,13 @@ class RoleAccessController extends BaseController {
                 logger.error(err);
                 res.json({code: 500, msg: err, data: []});
             } else {
-                console.log(data);
+                //console.log(data);
                 // 整合每个角色下所有的权限
                 let arr = comm.roleAllAccess(data);
-                console.log('arr', arr);
+                //console.log('arr', arr);
                 // 选出每个角色下实际存在的权限进行树形结构
                 let row = comm.realAccessToTree(arr);
-                console.log('arr2', JSON.stringify(row))
+                //console.log('arr2', JSON.stringify(row))
                 res.json({code: 200, msg: '', data: {tableData: row, totalNum: count}});
             }
         });
@@ -81,7 +81,7 @@ class RoleAccessController extends BaseController {
         let roleId = req.body.roleId||'';
         let type = req.body.type || '';
         let accessArr = req.body.accessArr||[];
-        if(!roleId || !type || accessArr.length<1){
+        if(!roleId || !type ){
            return res.json({code: 400, msg: 'params err'});
         }
         let params = {
@@ -96,6 +96,25 @@ class RoleAccessController extends BaseController {
                 res.json({code: 500, msg: err});
             } else {
                 res.json({code: 200, msg: '添加成功'});
+            }
+        });
+    }
+
+    getMyMenu(req, res){
+        let self = this;
+        let userId = req.user.id;
+        if(!userId ){
+            return res.json({code: 400, msg: 'params err'});
+        }
+        self.roleAccess.getMyMenu(userId, (err, row) => {
+            if (err) {
+                logger.error('出错');
+                logger.error(err);
+                res.json({code: 500, msg: err});
+            } else {
+                let tree = comm.formatMenu(row)
+                //console.log('getMyMenu:',tree)
+                res.json({code: 200, msg: 'ok', data: tree });
             }
         });
     }

@@ -21,32 +21,67 @@ class UserController extends BaseController {
 
     login(req, res, next) {
         let self = this;
-        let mobile = req.body.mobile;
+        let username = req.body.username;
         let password = req.body.password;
-        if (!mobile || !password) {
-            return res.json({code: 400, msg: '请填写手机号和密码'});
+
+        if (!username || !password) {
+            return res.json({code: 400, msg: '请填写用户名和密码'});
         }
-        password = comm.md5(comm.md5('' + mobile + password));
-        self.userModel.login(mobile, password, (err, row) => {
+
+        password = comm.md5(comm.md5('' + password + password));
+        console.log(username, password)
+        self.userModel.login(username, password, (err, row) => {
             if (err) {
                 logger.error(err);
                 return res.json({code: 500, msg: err});
             }
             if (row.length > 0) {
-                logger.info('登录mobile:' + mobile);
+                logger.info('登录username:' + username);
                 let doc = row[0];
                 let userinfo = {
                     id: doc.id,
-                    name: doc.name,
-                    mobile: doc.mobile,
-                    role: doc.role,
+                    username: doc.username,
+                    uptime: doc.uptime,
                     time: new Date().getTime()
                 };
                 userinfo.token = jwt.sign(userinfo, config.tokenSecret);
                 return res.json({code: 200, msg: '登录成功', data: userinfo});
             }
-            res.json({code: 400, msg: '请填写正确手机号和密码'});
+            res.json({code: 400, msg: '请填写正确用户名和密码'});
         });
+    }
+
+    checkUser(req, res, next) {
+        let self = this;
+        logger.info('登录者：',req.user)
+        if(!req.user){
+            logger.info('状态：无此用户')
+            return next({name: 'UnauthorizedError'})
+        }
+        self.userModel.checkUser(req.user.id, (err, row) => {
+            if (err) {
+                logger.error(err);
+                res.json({code: 500, msg: err});
+            } else {
+                if (row.length > 0) {
+                    let u = row[0];
+                    if (u.status !== 1) {
+                        logger.info('状态：拒绝登录')
+                        return next({name: 'UnauthorizedError'})
+                    }
+                    if (u.uptime !== req.user.uptime) {
+                        logger.info('状态：已经更新用户信息')
+                        return next({name: 'UnauthorizedError'})
+                    } else {
+                        logger.info('状态：通过')
+                        next()
+                    }
+                } else {
+                    logger.info('状态：无此用户')
+                    return next({name: 'UnauthorizedError'})
+                }
+            }
+        })
     }
 
     // 用户
@@ -140,13 +175,15 @@ class UserController extends BaseController {
         let pageStatus = req.query.pageStatus;
         let id = req.query.id;
         let params = {id: id, username: username, pageStatus: pageStatus};
+        console.log(params)
         self.userModel.checkUserName(params, (err, result) => {
             if (err) {
                 logger.error(err);
                 res.json({code: 500, msg: err});
             } else {
+                console.log(result)
                 if (result.length > 0) {
-                    return res.json({code: 500, msg: '已经存在'});
+                    return res.json({code: 500, msg: '已经存在了'});
                 }
                 res.json({code: 200, msg: ''});
             }
@@ -192,7 +229,7 @@ class UserController extends BaseController {
     password(req, res) {
         let self = this;
         let id = req.body.id;
-        let data = placeUserData(req.body);
+        let data = postData(req.body);
         self.userModel.edit(id, {password: data.password}, (err) => {
             if (err) {
                 logger.error('改密出错');
@@ -203,7 +240,6 @@ class UserController extends BaseController {
             }
         });
     }
-
 }
 
 function postData(body) {
@@ -213,7 +249,7 @@ function postData(body) {
         data.username = body.username.trim()
     }
     if (body.password) {
-        data.password = comm.md5(comm.md5('' + body.password))
+        data.password = comm.md5(comm.md5('' + body.password + body.password))
     }
     if (body.name && body.name.trim()) {
         data.name = body.name.trim()

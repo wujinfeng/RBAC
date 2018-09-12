@@ -12,8 +12,7 @@
       if (window.localStorage.getItem('token')) {
         let data = {
           id: localStorage.getItem('id'),
-          name: localStorage.getItem('name'),
-          mobile: localStorage.getItem('mobile'),
+          username: localStorage.getItem('username'),
           token: localStorage.getItem('token')
         }
         console.log('router,刷新', data)

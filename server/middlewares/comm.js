@@ -127,8 +127,6 @@ let formatMenu = function(arr){
             data.push(tree[i])
         }
     }
-    console.log(JSON.stringify(tree))
-    console.log(JSON.stringify(data))
     return data;
 };
 
@@ -178,7 +176,6 @@ let realAccessToTree= function(arr){
         }
         console.log('hasAccessArr', hasAccessArr);
         let tree = formatMenu(hasAccessArr);
-        console.log('tree', tree)
         arr[i].tree = tree;
         delete arr[i].accessArr;
     }

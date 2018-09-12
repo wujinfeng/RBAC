@@ -14,7 +14,7 @@
           <router-link :to="{name:'RoleAdd',params:{id: scope.row.id, row: scope.row}}">
             <el-button type="primary" size="small">编辑</el-button>
           </router-link>
-          <el-button type="primary" size="small" @click="del(scope.row.id, scope.$index)">删除</el-button>
+          <el-button type="danger" size="small" @click="del(scope.row.id, scope.$index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

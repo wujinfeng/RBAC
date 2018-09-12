@@ -35,7 +35,7 @@ router.post('/edit', function (req, res) {
 });
 
 //删除
-router.get('/del/:id', function (req, res) {
+router.get('/delete/:id', function (req, res) {
     new Con(req).del(req, res);
 });
 

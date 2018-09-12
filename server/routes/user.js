@@ -33,10 +33,6 @@ router.get('/allUser', function (req, res, next) {
     new UserController(req).allUser(req, res, next);
 });
 
-router.get('/name/:name', function (req, res, next) {
-    new UserController(req).filterName(req, res, next);
-});
-
 router.get('/auth', function (req, res, next) {
     new UserController(req).authStatus(req, res, next);
 });
@@ -46,13 +42,8 @@ router.post('/upload', upload.array('image', 1), function (req, res, next) {
 });
 
 // 检查手机号是否存在
-router.get('/checkMobile', function (req, res, next) {
-    new UserController(req).checkMobile(req, res, next);
-});
-
-// 统计： 获取所有商家
-router.get('/merchant', function (req, res, next) {
-    new UserController(req).merchant(req, res, next);
+router.get('/checkUserName', function (req, res, next) {
+    new UserController(req).checkUserName(req, res, next);
 });
 
 module.exports = router;

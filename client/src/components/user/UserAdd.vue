@@ -62,7 +62,7 @@
           return callback(new Error('不能为空'))
         }
         let username = value.toString()
-        that.$axios.get('/admin/user/checkUserName/?pageStatus=' + that.pageStatus + '&username=' + username).then(function (res) {
+        that.$axios.get('/admin/user/checkUserName/?pageStatus=' + that.pageStatus + '&username=' + username + '&id=' + that.ruleForm.id).then(function (res) {
           if (res.status === 200 && res.data.code === 200) {
             return callback()
           } else {

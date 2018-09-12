@@ -97,11 +97,30 @@
         this.dialogVisible = true
         // 获取所有key,即id
         let currentIdArr = that.getCurrentIdArr(that.currentMenuTree)
-        console.log(currentIdArr)
-        that.$refs.tree.setCheckedKeys(currentIdArr)
+        console.log('currentIdArr:', currentIdArr)
+        that.$nextTick(function () {
+          that.$refs.tree.setCheckedKeys(currentIdArr)
+        })
       },
       saveAccess() {
-        this.dialogVisible = false
+        let that = this
+        let getCheckedKeys = that.$refs.tree.getCheckedKeys()
+        let getHalfCheckedKeys = that.$refs.tree.getHalfCheckedKeys()
+        console.log('getCheckedKeys:', getCheckedKeys)
+        console.log('getHalfCheckedKeys:', getHalfCheckedKeys)
+        let checkedkeys = getCheckedKeys.concat(getHalfCheckedKeys)
+        let params = {accessArr: checkedkeys, roleId: that.currentRoleId, type: 1} // type 1:菜单，2元素
+        that.$axios.post('/admin/roleAccess/add', params).then(function (res) {
+          if (res.status === 200 && res.data.code === 200) {
+            that.$message({type: 'success', message: '保存成功'})
+            that.dialogVisible = false
+          } else {
+            that.$message({type: 'error', message: '保存失败'})
+          }
+        }).catch((error) => {
+          console.log(error)
+          that.$message({type: 'error', message: '保存失败'})
+        })
       },
       cancelSaveAccess() {
         this.dialogVisible = false

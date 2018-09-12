@@ -26,7 +26,7 @@
     },
     data() {
       return {
-        name: '王小虎'
+        name: ''
       }
     },
     components: {

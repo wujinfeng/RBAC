@@ -35,7 +35,7 @@ let router = new Router({
       path: '/',
       component: Main,
       children: [
-        {path: '/index', name: 'Index', component: Index},
+        {path: 'index', name: 'Index', component: Index},
         {path: 'UserAdd', name: 'UserAdd', component: UserAdd}, // 用户添加
         {path: 'UserList', name: 'UserList', component: UserList}, // 用户列表
         {path: 'UserRoleList', name: 'UserRoleList', component: UserRoleList}, // 用户角色

@@ -1,7 +1,7 @@
 /**
  * 用户信息
  */
-
+const async = require('async');
 const BaseModel = require('./BaseModel');
 const mysql = require('mysql');
 
@@ -56,30 +56,6 @@ class RoleModel extends BaseModel {
         self.execSql(execParam, cb);
     }
 
-    // 获取一个角色的所有权限
-    getAccessByRoleId(roleId, cb) {
-        let self = this;
-        // 菜单权限
-        let sqlMenu = `SELECT ra.roleId,ra.accessId,m.name,
-         DATE_FORMAT(ra.ctime, "%Y-%m-%d %H:%i:%s") as ctime
-         FROM ${self.baseDb}role_access ra
-         LEFT JOIN ${self.baseDb}menu m ON ra.accessId=m.id and ra.type=1`;
-        // 元素权限
-        let sqlElement = `SELECT ra.roleId,ra.accessId,e.name,
-         DATE_FORMAT(ra.ctime, "%Y-%m-%d %H:%i:%s") as ctime
-         FROM ${self.baseDb}role_access ra
-         LEFT JOIN ${self.baseDb}element e ON ra.accessId=e.id and ra.type=2`;
-        let execParam = self.getExecParamByOption(sqlMenu);
-        self.execSql(execParam, function (err) {
-            if (err) {
-                cb(err);
-            } else {
-                let execParam = self.getExecParamByOption(sqlElement);
-                self.execSql(execParam, cb);
-            }
-        });
-    }
-
     edit(id, data, cb) {
         let self = this;
         let sql = `update ${self.baseDb}role set ? where id=?`;
@@ -96,9 +72,27 @@ class RoleModel extends BaseModel {
 
     del(id, cb) {
         let self = this;
+        let accessSql = `delete from ${self.baseDb}role_access where roleId=?`;
+        let userSql = `delete from ${self.baseDb}user_role where roleId=?`;
         let sql = `delete from ${self.baseDb}role where id=?`;
-        let execParam = self.getExecParamByOption(sql, id);
-        self.execSql(execParam, cb);
+        // 删除角色和用户关系，角色和权限关系
+        async.series([
+                function (callback) {
+                    let execParam = self.getExecParamByOption(accessSql, id);
+                    self.execSql(execParam, callback);
+                },
+                function (callback) {
+                    let execParam = self.getExecParamByOption(userSql, id);
+                    self.execSql(execParam, callback);
+                },
+                function (callback) {
+                    let execParam = self.getExecParamByOption(sql, id);
+                    self.execSql(execParam, callback);
+                }
+            ],
+            function (err, results) {
+                cb(err, results)
+            });
     }
 
 }

@@ -16,20 +16,18 @@
       return {
         ruleForm: {
           id: '',
-          mobile: '',
           password: ''
         },
         rules: {
           password: [
             {required: true, message: '请输入新密码', trigger: 'blur'},
-            {min: 8, max: 20, message: '长度在 8 到 20 个字符', trigger: 'blur'}
+            {min: 6, max: 30, message: '长度在 6 到 30 个字符', trigger: 'blur'}
           ]
         }
       }
     },
     beforeMount() {
       this.ruleForm.id = this.$route.params.id
-      this.ruleForm.mobile = this.$route.params.mobile
       console.log(this.ruleForm.id)
     },
     methods: {
@@ -39,7 +37,6 @@
           if (valid) {
             let form = {
               id: that.ruleForm.id,
-              mobile: that.ruleForm.mobile,
               password: that.ruleForm.password
             }
             let url = '/admin/user/password'

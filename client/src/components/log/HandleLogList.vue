@@ -59,6 +59,7 @@
             }
           }]
         },
+        username: '',
         createdAt: [],
         tableData: [],
         totalNum: 0

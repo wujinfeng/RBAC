@@ -4,14 +4,14 @@
       <i class="el-icon-setting" style="margin-right: 15px"></i>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item>
-          <router-link :to="{name:'Password',params:{id: id,mobile: mobile}}" tag="span">
+          <router-link :to="{name:'Password',params:{id: id}}" tag="span">
             修改密码
           </router-link>
         </el-dropdown-item>
         <el-dropdown-item><span @click="quit">退出</span></el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
-    <span>{{name}}</span>
+    <span>{{username}}</span>
   </el-header>
 </template>
 
@@ -23,8 +23,7 @@
     data() {
       return {
         id: '',
-        mobile: '',
-        name: ''
+        username: ''
       }
     },
     methods: {
@@ -35,8 +34,7 @@
     },
     mounted() {
       this.id = localStorage.getItem('id')
-      this.name = localStorage.getItem('name')
-      this.mobile = localStorage.getItem('mobile')
+      this.username = localStorage.getItem('username')
     }
   }
 </script>

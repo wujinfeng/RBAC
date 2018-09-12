@@ -22,4 +22,11 @@ router.post('/add', function (req, res, next) {
     new Con(req).add(req, res, next);
 });
 
+
+// 获取登陆者的菜单权限
+router.get('/myMenu', function (req, res, next) {
+    new Con(req).getMyMenu(req, res, next);
+});
+
+
 module.exports = router;
